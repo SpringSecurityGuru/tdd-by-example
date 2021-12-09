@@ -4,7 +4,7 @@ package guru.springframework;
  * John Morris - 12/6/21
  * tdd-by-example
  **/
-public  class Money {  //Remove the abstract
+public  class Money implements Expression {
     protected int amount;
     protected String currency;
 
@@ -15,9 +15,7 @@ public  class Money {  //Remove the abstract
     protected String currency() {
         return currency;
     }
-//    public Money times(int multiplier){
-//        return null;
-//    }; //Removed the abstract from the method
+
     public static Money dollar(int amount){
         return new Money(amount, "USD");
     }
@@ -27,8 +25,13 @@ public  class Money {  //Remove the abstract
     public boolean equals(Object object){
         Money money = (Money) object;
         return amount == money.amount
-                && this.currency == money.currency; // AFTER
-//                && this.getClass().equals(object.getClass());  //BEFORE
+                && this.currency == money.currency;
+    }
+
+    @Override
+    public Money reduce(Bank bank,String to){
+//        int rate = (currency.equals("CHF") && to.equals("USD")) ? 2 : 1;
+        return new Money(amount / bank.rate(this.currency, to), to);
     }
 
     @Override
@@ -38,11 +41,12 @@ public  class Money {  //Remove the abstract
                 ", currency='" + currency + '\'' +
                 '}';
     }
-
-    //    public Money times(int multiplier){
-    //        return Money.franc(amount * multiplier);
-    //    }
-        public Money times(int multiplier){
+    @Override
+    public Expression times(int multiplier){
             return new Money(amount * multiplier, this.currency);
-        }
+    }
+    @Override
+    public Expression plus(Expression addend){
+        return new Sum(this, addend);
+    }
 }
